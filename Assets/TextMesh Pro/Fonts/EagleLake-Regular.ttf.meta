@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 5d38e834e16496b4b9628b20875ff240
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Eagle Lake
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 50edf36b740e6624492af91de08e0838, type: 3}
+  - {fileID: 12800000, guid: 24cd8999c4d1b9044b42f50f724b9309, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
