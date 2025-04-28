@@ -19,23 +19,22 @@ public class PlayerControl : MonoBehaviour
     public static bool playerOneTurnIsOver = true;
     public static bool playerTwoTurnIsOver = true;
     private int lives;
-    public bool reachedGoal = false;
-    private bool invicible = false;
+    public bool reachedGoal = false; // Flag to check if the player has reached the goal
+    private bool invicible = false; // Flag to indicate if the player is invincible
     
-    // UI
-    private HandleHeadUpDisplay handleHeadUpDisplay;
+    private HandleHeadUpDisplay handleHeadUpDisplay; // Head up display for displacing lives left
 
     [Header("For Movement")]
     [SerializeField] public float moveSpeed = 4f;
     [SerializeField] private float groundDrag;
-    private float xDirectionalInput;
+    private float xDirectionalInput; // Holds input for left/right movement
     private bool facingRight = true;
     private Vector3 movement;
 
     [Header("For Jumping")] 
-    [SerializeField] float jumpForce = 8f;
-    [SerializeField] LayerMask groundLayer;
-    [SerializeField] Transform groundCheckPoint;
+    [SerializeField] float jumpForce = 8f; // Force applied for jumping
+    [SerializeField] LayerMask groundLayer; // Layer to check for ground collisions
+    [SerializeField] Transform groundCheckPoint; // Point used to check if the player is grounded
     [SerializeField] private float groundRadius;
     [SerializeField] private float jumpCooldown = 1f;
     [SerializeField] private float airMultiplier;
@@ -45,8 +44,8 @@ public class PlayerControl : MonoBehaviour
 
     [Header("For WallSliding")] 
     //[SerializeField] float wallSlideSpeed = 0f;
-    [SerializeField] LayerMask wallLayer;
-    [SerializeField] Transform wallCheckPoint;
+    [SerializeField] LayerMask wallLayer; // Layer to check for wall collisions
+    [SerializeField] Transform wallCheckPoint; // Point used to check if the player is against a wall
     [SerializeField] private float wallRadius;
     [SerializeField] private bool isWall;
     [SerializeField] private bool isWallSliding;
@@ -75,11 +74,13 @@ public class PlayerControl : MonoBehaviour
 
     void Update()
     {
+        // Process inputs, check environment conditions, control speed, and handle wall jumping
         ProcessInputs();
         CheckEnvironment();
         SpeedControl();
         WallJump();
-
+        
+        // Apply ground drag if grounded, otherwise no drag
         if (isGrounded)
         {
             RB.drag = groundDrag;
@@ -99,9 +100,10 @@ public class PlayerControl : MonoBehaviour
 
     void InitPlayer()
     {
-        lives = initialLives;
+        lives = initialLives; // Set initial lives
         RB = GetComponent<Rigidbody>();
 
+        // Set initial position and controls based on player number
         if (playerNumber == 1)
         {
             transform.position = new Vector3(8f, 4.5f, 0f);
@@ -117,17 +119,19 @@ public class PlayerControl : MonoBehaviour
     }
     void ProcessInputs()
     {
-        xDirectionalInput = Input.GetAxisRaw(horizontalAxis);
-        pressedJump = Input.GetKeyDown(jumpKey);
+        xDirectionalInput = Input.GetAxisRaw(horizontalAxis); // Get horizontal input
+        pressedJump = Input.GetKeyDown(jumpKey); // Check if jump key is pressed
         
+        // Handle jumping if grounded and can jump
         if (isGrounded && canJump && pressedJump)
         {
             canJump = false;
             Jump();
-            animator.SetBool("isJumping", true);
-            Invoke(nameof(ResetJump), jumpCooldown);
+            animator.SetBool("isJumping", true); // Trigger jump animation
+            Invoke(nameof(ResetJump), jumpCooldown); // Reset jump after cooldown
         }
-
+    
+        // Update jump animation based on grounded/wall status
         if (!isGrounded && !isWall)
         {
             animator.
@@ -141,37 +145,34 @@ public class PlayerControl : MonoBehaviour
 
     void Jump()
     {
-        RB.velocity = new Vector3(RB.velocity.x, 0f, 0f);
-        RB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // RB.AddForce(transform.up * jumpForce, ForceMode.Impulse)
+        RB.velocity = new Vector3(RB.velocity.x, 0f, 0f); // Reset vertical velocity
+        RB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);  // Apply jump force
     }
 
     void ResetJump()
     {
-        canJump = true;
+        canJump = true; // Allow jumping again
     }
 
     void CheckEnvironment()
     {
+        // Check if the player is grounded or against a wall
         isGrounded = Physics.CheckSphere(groundCheckPoint.position, groundRadius, groundLayer);
         isWall = Physics.CheckSphere(wallCheckPoint.position, wallRadius, wallLayer);
     }
 
     void Move()
     {
+        // Stop movement if the player has reached the goal
         if (reachedGoal)
         {
             RB.velocity = Vector3.zero;
-            //if (isGrounded && canJump)
-            //{
-            //    canJump = false;
-            //    Jump();
-            //   Invoke(nameof(ResetJump), jumpCooldown);
-            //}
             return;
         }
             
         movement = new Vector3(xDirectionalInput, 0f, 0f);
         
+        // Trigger running animation if moving
         if (xDirectionalInput != 0)
         {
             animator.SetBool("isRunning", true);
@@ -180,7 +181,8 @@ public class PlayerControl : MonoBehaviour
         {
             animator.SetBool("isRunning", false);
         }
-
+        
+        // Apply movement force based on grounded/air status
         if (isGrounded)
         {
             RB.AddForce(movement.normalized * moveSpeed * 5f, ForceMode.Force);
@@ -189,12 +191,14 @@ public class PlayerControl : MonoBehaviour
         {
             RB.AddForce(movement.normalized * moveSpeed * 5f * airMultiplier, ForceMode.Force);
         }
-
+    
+        // Flip the player if moving in the opposite direction
         if (xDirectionalInput < 0 && facingRight || xDirectionalInput > 0 && !facingRight)
         {
             Flip();
         }
-
+        
+        // Handle losing a life if the player falls below a certain height
         if (transform.position.y < -13f)
         {
             LosingLive();
@@ -204,7 +208,7 @@ public class PlayerControl : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        // Überprüfen, ob das Objekt mit dem Tag "weapon" ist
+        // Handle losing a life if hit by a weapon
         if (other.CompareTag("weapon") && other.gameObject.layer == LayerMask.NameToLayer("Dead"))
         {
             if (!invicible)
@@ -215,8 +219,9 @@ public class PlayerControl : MonoBehaviour
     }
     private void LosingLive()
     {
-        lives--;
+        lives--; // Decrease lives
         
+        // Reset position and update HUD based on player number
         if (playerNumber == 1)
         {
             transform.position = new Vector3(8f, 4.5f, 0f);
@@ -229,13 +234,14 @@ public class PlayerControl : MonoBehaviour
         }
         
         Debug.Log($"Player {playerNumber} - Lives Left: {lives}");
-        StartCoroutine(HandleInvincibility());
-        IsDead();
+        StartCoroutine(HandleInvincibility()); // Handle invincibility after losing a life
+        IsDead(); // Check if the player is dead
         
     }
     
     private void IsDead()
     {
+        // Handle player death if lives are depleted
         if (lives < 1)
         {
             transform.position = new Vector3(0, 2, 0);
@@ -250,10 +256,10 @@ public class PlayerControl : MonoBehaviour
                 playerTwoIsDead = true;
             }
 
-            DeactivatePlayer();
+            DeactivatePlayer(); // Deactivate the player
             if (gameManager != null)
             {
-                gameManager.CheckGameState();
+                gameManager.CheckGameState(); // Check the game state if phase has to be changed because both player are either dead or in goal
             }
         }
     }
@@ -279,7 +285,7 @@ public class PlayerControl : MonoBehaviour
         if (isWall && !isGrounded)
         {
             isWallSliding = true;
-            //RB.velocity = new Vector3(0, wallSlideSpeed, 0f); //führt zu Fehlern!!!!!
+            //RB.velocity = new Vector3(0, wallSlideSpeed, 0f); 
         }
         else
         {
@@ -311,10 +317,10 @@ public class PlayerControl : MonoBehaviour
 
     public void ResetPlayer()
     {
-        print("reset was done");
-        print($"Mal gucken reached goal: {reachedGoal}");
+        // Reset the player's state
         if (RB == null) RB = GetComponent<Rigidbody>();
-
+        
+        // Reset position based on player number
         if (playerNumber == 1)
         {
             transform.position = new Vector3(8f, 4.5f, 0f);
@@ -333,8 +339,6 @@ public class PlayerControl : MonoBehaviour
         playerOneReachedGoal = false;
         playerTwoReachedGoal = false;
         playerOneTurnIsOver = false;
-        playerTwoTurnIsOver = false;
-        print($"Mal gucken zwei: {reachedGoal}");
         RB.isKinematic = false;
     }
 
