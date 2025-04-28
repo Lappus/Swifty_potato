@@ -8,15 +8,12 @@ public class Camera_Movement : MonoBehaviour
     private Transform target;
 
     private Vector3 offset;
-    
-    // Start is called before the first frame update
+
     void Start()
     {
         offset = transform.position - target.transform.position;
     }
 
-    // Update is called once per frame
-    
     // date nur nach x und y up und nicht nach z
     void LateUpdate()
     {

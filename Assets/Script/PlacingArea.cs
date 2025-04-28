@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
+// Visual adjustments of the active placement area background
 public class PlacingArea : MonoBehaviour
 {
     public Image background;
@@ -10,16 +12,18 @@ public class PlacingArea : MonoBehaviour
 
     void Start()
     {
-        // Setze die Durchsichtigkeit auf 50%
+        // set the transparency of the background to 50%
         SetImageTransparency(0.5f);
     }
 
     public void SetImageTransparency(float alpha)
     {
-        Color color = background.color; // Aktuellen Farbwert holen
-        color.a = alpha; // Alpha-Wert setzen
-        background.color = color; // Neuen Farbwert anwenden
+        // background
+        Color color = background.color; // current colour value 
+        color.a = alpha; // alpha value
+        background.color = color; // new colour value
 
+        // and the same for the text
         Color textColor = backgroundtext.color;
         textColor.a = alpha;
         backgroundtext.color = textColor;

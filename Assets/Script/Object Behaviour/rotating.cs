@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Rotation for the trapdoor
 public class rotating : MonoBehaviour
 {
     private bool isPlacedOnGrid = false;
@@ -11,6 +12,7 @@ public class rotating : MonoBehaviour
     private void Update()
     {
         bool previousPlacedOnGrid = isPlacedOnGrid;
+        // bool for checking if the trapdoor is placed on the active placement area
         isPlacedOnGrid = CheckIfPlacedOnGrid();
 
         // Start coroutine when object is placed on the grid and not already rotating
@@ -36,10 +38,10 @@ public class rotating : MonoBehaviour
         
         if (PlayerGoalStatus.gameplayStarted & isPlacedOnGrid)
         {
-            // Graduelle Drehung bis zu -90 Grad
-            float rotationDuration = 0.75f;
-            float targetRotationDown = -90f;
-            float startRotationDown = transform.rotation.eulerAngles.z;
+            // Gradual rotation down to -90 degrees
+            float rotationDuration = 0.75f; // Duration of the downward rotation
+            float targetRotationDown = -90f; // Target angle for downward rotation
+            float startRotationDown = transform.rotation.eulerAngles.z; // Starting angle
             float t = 0f;
         
             while (t < 1f)
@@ -50,25 +52,27 @@ public class rotating : MonoBehaviour
                 yield return null;
             }
 
-            // Wartezeit von 3 Sekunden
+            // wait for 3 seconds
             yield return new WaitForSeconds(3f);
 
-            // Graduelle Drehung zurück auf 0 Grad
-            t = 0f;
-            float targetRotationUp = 0f;
-            float startRotationUp = -90f;
+            // Gradually rotate back to 0 degrees
+            // Gradually rotate the trapdoor back up to 0 degrees
+            t = 0f; // Reset time multiplier for the return rotation
+            float targetRotationUp = 0f; // Target angle for return rotation
+            float startRotationUp = -90f; // Starting angle for return
             while (t < 1f)
             {
-                t += Time.deltaTime / rotationDuration;
-                float currentRotation = Mathf.Lerp(startRotationUp, targetRotationUp, t * t);
+                t += Time.deltaTime / rotationDuration; // Increment time factor
+                float currentRotation = Mathf.Lerp(startRotationUp, targetRotationUp, t * t); // Same smoothing technique
                 transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, currentRotation);
-                yield return null;
+                yield return null; // Continue coroutine to next frame
             }
         }
     }
     
     private bool CheckIfPlacedOnGrid()
     {
+        // Active placement area
         if (transform.position.x > -9 & transform.position.x < 80 & transform.position.y > -9 &
          transform.position.y < 40)
         {

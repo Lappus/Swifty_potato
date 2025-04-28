@@ -44,7 +44,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private bool pressedJump;
 
     [Header("For WallSliding")] 
-    [SerializeField] float wallSlideSpeed = 0f;
+    //[SerializeField] float wallSlideSpeed = 0f;
     [SerializeField] LayerMask wallLayer;
     [SerializeField] Transform wallCheckPoint;
     [SerializeField] private float wallRadius;
@@ -126,6 +126,12 @@ public class PlayerControl : MonoBehaviour
             Jump();
             animator.SetBool("isJumping", true);
             Invoke(nameof(ResetJump), jumpCooldown);
+        }
+
+        if (!isGrounded && !isWall)
+        {
+            animator.
+            SetBool("isJumping", true);
         }
         else
         {
